@@ -1,6 +1,16 @@
 History
 =========
 
+1.0.5
+-------
+
+* Fix CImg.h compilation problems. [#10]
+
+1.0.4
+-------
+
+* Fix pthread linking on Ubuntu 11.04
+
 1.0.3
 -------
 
