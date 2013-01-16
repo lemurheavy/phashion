@@ -1,15 +1,24 @@
 #include "ruby.h"
 #include "pHash.h"
 
-static VALUE image_hash_for(VALUE self, VALUE _filename) {
+static VALUE image_hash_with_algo_for(VALUE self, VALUE _filename, VALUE algo) {
     char * filename = StringValuePtr(_filename);
     ulong64 hash;
-    if (-1 == ph_dct_imagehash(filename, hash)) {
-      rb_raise(rb_eRuntimeError, "Unknown pHash error");
-    }
-    return ULL2NUM(hash);
-}
+    int n;
 
+    if (algo == ID2SYM(rb_intern("dct"))) {
+      if (-1 == ph_dct_imagehash(filename, hash)) {
+        rb_raise(rb_eRuntimeError, "Unknown pHash error");
+      }
+      return ULL2NUM(hash);
+
+    } else if (algo == ID2SYM(rb_intern("mh"))) {
+      return UINT2NUM((uintptr_t)ph_mh_imagehash(filename, n));
+
+    } else {
+      rb_raise(rb_eRuntimeError, "Unknown pHash algo");
+    }
+}
 
 static VALUE hamming_distance(VALUE self, VALUE a, VALUE b) {
     int result = 0;
@@ -28,7 +37,7 @@ extern "C" {
     c = rb_const_get(c, rb_intern("Phashion"));
 
     rb_define_singleton_method(c, "hamming_distance", (VALUE(*)(ANYARGS))hamming_distance, 2);
-    rb_define_singleton_method(c, "image_hash_for", (VALUE(*)(ANYARGS))image_hash_for, 1);
+    rb_define_singleton_method(c, "image_hash_with_algo_for", (VALUE(*)(ANYARGS))image_hash_with_algo_for, 2);
   }
 #ifdef __cplusplus
 }

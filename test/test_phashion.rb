@@ -8,6 +8,10 @@ class TestPhashion < Test::Unit::TestCase
     assert_duplicate images[0], images[1]
     assert_duplicate images[1], images[2]
     assert_duplicate images[0], images[2]
+
+    assert_duplicate images[0], images[1], :mh
+    assert_duplicate images[1], images[2], :mh
+    assert_duplicate images[0], images[2], :mh
   end
 
   def test_duplicate_detection_2
@@ -16,6 +20,10 @@ class TestPhashion < Test::Unit::TestCase
     assert_duplicate images[0], images[1]
     assert_duplicate images[1], images[2]
     assert_duplicate images[0], images[2]
+
+    assert_duplicate images[0], images[1], :mh
+    assert_duplicate images[1], images[2], :mh
+    assert_duplicate images[0], images[2], :mh
   end
 
   def test_not_duplicate
@@ -24,6 +32,10 @@ class TestPhashion < Test::Unit::TestCase
     assert_not_duplicate images[0], images[3]
     assert_not_duplicate images[1], images[3]
     assert_not_duplicate images[2], images[3]
+
+    assert_not_duplicate images[0], images[3], :mh
+    assert_not_duplicate images[1], images[3], :mh
+    assert_not_duplicate images[2], images[3], :mh
   end
 
   def test_multiple_types
@@ -33,15 +45,19 @@ class TestPhashion < Test::Unit::TestCase
     assert_duplicate jpg, png
     assert_duplicate gif, png
     assert_duplicate jpg, gif
+
+    assert_duplicate jpg, png, :mh
+    assert_duplicate gif, png, :mh
+    assert_duplicate jpg, gif, :mh
   end
 
   private
 
-  def assert_duplicate(a, b)
-    assert a.duplicate?(b), "#{a.filename} not dupe of #{b.filename}"
+  def assert_duplicate(a, b, algo=nil)
+    assert a.duplicate?(b, algo), "#{a.filename} not dupe of #{b.filename}"
   end
 
-  def assert_not_duplicate(a, b)
-    assert !a.duplicate?(b), "#{a.filename} dupe of #{b.filename}"
+  def assert_not_duplicate(a, b, algo=nil)
+    assert !a.duplicate?(b, algo), "#{a.filename} dupe of #{b.filename}"
   end  
 end
