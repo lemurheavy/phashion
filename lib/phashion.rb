@@ -25,14 +25,25 @@ module Phashion
     attr_reader :filename
     def initialize(filename)
       @filename = filename
+      @hash = {}
     end
 
     def duplicate?(other, algo=SETTINGS[:algo])
-      Phashion.hamming_distance(fingerprint(algo), other.fingerprint(algo)) < SETTINGS[:dupe_threshold]
+      if algo == :mh
+        hd = Phashion.mh_hamming_distance(mh_fingerprint, other.mh_fingerprint)
+        puts "hd: #{hd}"
+        hd
+      else
+        Phashion.hamming_distance(fingerprint(algo), other.fingerprint(algo))
+      end < SETTINGS[:dupe_threshold]
     end
 
     def fingerprint(algo=SETTINGS[:algo])
-      @hash ||= Phashion.image_hash_for(@filename, algo)
+      @hash[algo] ||= Phashion.image_hash_for(@filename, algo)
+    end
+
+    def mh_fingerprint
+      fingerprint(:mh).inject(""){|str, a| str += a.to_s(2).rjust(8, '0')}.to_i(2)
     end
 
   end
@@ -40,6 +51,11 @@ module Phashion
   def self.image_hash_for(filename, algo=nil)
     algo ||= Image::SETTINGS[:algo]
     image_hash_with_algo_for(filename, algo)
+  end
+
+  def self.mh_hamming_distance(f1, f2)
+    xor = (f1 ^ f2).to_s(2)
+    (xor.gsub(/0/,'').length / xor.length.to_f * 100).round
   end
 end
 

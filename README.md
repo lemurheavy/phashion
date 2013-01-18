@@ -33,6 +33,9 @@ Usage
     img1 = Phashion::Image.new(filename1)
     img2 = Phashion::Image.new(filename2)
     img1.duplicate?(img2)
+
+    # mexican hat wavelet algorithm usage:
+    img1.duplicate?(img2, :mh)
     --> true
 
 Author

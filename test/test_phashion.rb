@@ -1,4 +1,5 @@
 require 'helper'
+require 'debugger'
 
 class TestPhashion < Test::Unit::TestCase
 
@@ -21,9 +22,10 @@ class TestPhashion < Test::Unit::TestCase
     assert_duplicate images[1], images[2]
     assert_duplicate images[0], images[2]
 
-    assert_duplicate images[0], images[1], :mh
-    assert_duplicate images[1], images[2], :mh
-    assert_duplicate images[0], images[2], :mh
+    Phashion::Image::SETTINGS[:dupe_threshold] = 20
+    assert_duplicate images[0], images[1], :mh # 19
+    assert_duplicate images[1], images[2], :mh # 18
+    assert_duplicate images[0], images[2], :mh # 11
   end
 
   def test_not_duplicate
@@ -51,7 +53,25 @@ class TestPhashion < Test::Unit::TestCase
     assert_duplicate jpg, gif, :mh
   end
 
+  # def test_mh_hamming_distance
+  #   files = %w(86x86-0a1e.jpeg 86x86-83d6.jpeg 86x86-a855.jpeg)
+  #   images = files.map {|f| Phashion::Image.new("#{File.dirname(__FILE__) + '/../test/jpg/'}#{f}")}
+  #   a = images[0]
+  #   b = images[3]
+
+  #   assert_similarity images[0], images[1]
+  #   assert_similarity images[1], images[2]
+  #   assert_similarity images[0], images[2]
+  # end
+
   private
+
+  # def assert_similarity(a, b, algo=:mh)
+  #   f1 = a.mh_fingerprint
+  #   f2 = b.mh_fingerprint
+
+  #   assert Phashion.mh_hamming_distance(f1, f2) < Phashion::Image::SETTINGS[:dupe_threshold]
+  # end
 
   def assert_duplicate(a, b, algo=nil)
     assert a.duplicate?(b, algo), "#{a.filename} not dupe of #{b.filename}"
